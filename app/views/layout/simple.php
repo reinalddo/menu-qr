@@ -9,7 +9,7 @@ use MenuQr\I18n;
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
     <title><?= e($title ?? 'menu-qr') ?></title>
-    <link rel="stylesheet" href="/assets/css/app.css?v=<?= e(APP_VERSION) ?>">
+    <link rel="stylesheet" href="<?= e(asset('/assets/css/app.css')) ?>">
 </head>
 <body class="page-simple">
     <main class="simple-card">

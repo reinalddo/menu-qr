@@ -95,4 +95,4 @@ $invalid = static fn (string $field): string => !empty($errors[$field]) ? ' aria
     <button type="submit" class="button button-primary"><?= e(t('install.submit')) ?></button>
 </form>
 
-<script src="/assets/js/install.js?v=<?= e(APP_VERSION) ?>"></script>
+<script src="<?= e(asset('/assets/js/install.js')) ?>"></script>

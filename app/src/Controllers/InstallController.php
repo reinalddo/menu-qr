@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MenuQr\Controllers;
 
 use DateTimeZone;
+use MenuQr\Auth;
 use MenuQr\Codes;
 use MenuQr\Csrf;
 use MenuQr\Db;
@@ -56,9 +57,8 @@ final class InstallController
 
             $errors = self::validate($values);
             if ($errors === []) {
-                self::install($values, Http::input('password'));
-                Session::start();
-                Session::regenerate();
+                $adminId = self::install($values, Http::input('password'));
+                Auth::login($adminId);
                 $_SESSION['install_done'] = true;
                 Http::redirect('/install/done');
             }
@@ -135,7 +135,8 @@ final class InstallController
         return $errors;
     }
 
-    private static function install(array $values, string $password): void
+    /** @return int id of the new admin */
+    private static function install(array $values, string $password): int
     {
         $pdo = Db::pdo();
         $pdo->query("SELECT GET_LOCK('menuqr_install', 10)");
@@ -147,6 +148,7 @@ final class InstallController
             $pdo->beginTransaction();
             $pdo->prepare('INSERT INTO admins (email, password_hash, language) VALUES (?, ?, ?)')
                 ->execute([$values['email'], password_hash($password, PASSWORD_DEFAULT), $values['language']]);
+            $adminId = (int) $pdo->lastInsertId();
 
             Settings::setMany([
                 'restaurant_name' => $values['restaurant_name'],
@@ -165,6 +167,7 @@ final class InstallController
 
             Codes::clear(Codes::SETUP);
             RateLimiter::clear(self::LIMIT_SCOPE);
+            return $adminId;
         } catch (\Throwable $exception) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();

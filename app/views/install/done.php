@@ -7,4 +7,5 @@
 <p class="url-box"><?= e($menuUrl) ?></p>
 <p class="muted"><?= e(t('install.done.next')) ?></p>
 
-<a class="button button-primary" href="/"><?= e(t('install.done.view_menu')) ?></a>
+<a class="button button-primary" href="/admin"><?= e(t('install.done.go_admin')) ?></a>
+<p class="center-link"><a href="/" target="_blank" rel="noopener"><?= e(t('install.done.view_menu')) ?></a></p>

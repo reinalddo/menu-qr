@@ -15,6 +15,25 @@
 
 * { box-sizing: border-box; }
 
+/* Classes that set display would otherwise override the hidden attribute. */
+[hidden] { display: none !important; }
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.center-link { text-align: center; margin: 1rem 0 0; }
+.form-submit { margin-top: 1.25rem; }
+
+.help-box { margin-top: 1.5rem; font-size: .9rem; color: var(--muted); }
+.help-box summary { cursor: pointer; color: var(--brand-dark); font-weight: 600; }
+.help-box p { margin: .5rem 0 0; }
+
 body {
     margin: 0;
     font-family: var(--font);

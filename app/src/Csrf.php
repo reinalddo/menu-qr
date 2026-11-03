@@ -20,9 +20,10 @@ final class Csrf
         return '<input type="hidden" name="_csrf" value="' . e(self::token()) . '">';
     }
 
+    /** Accepts the token from the form field or, for fetch() calls, the X-CSRF-Token header. */
     public static function valid(): bool
     {
-        $sent = $_POST['_csrf'] ?? '';
+        $sent = $_POST['_csrf'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
         return is_string($sent) && $sent !== '' && hash_equals(self::token(), $sent);
     }
 }
