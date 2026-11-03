@@ -1,0 +1,15 @@
+# Internal notes (not part of the public repo)
+CLAUDE.md
+
+# Local environment
+.env
+docker-compose.override.yml
+
+# Dependencies
+/vendor/
+
+# Editors and OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

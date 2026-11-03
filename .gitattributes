@@ -1,0 +1,7 @@
+# Always LF: shell scripts and configs are copied into Linux containers
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
