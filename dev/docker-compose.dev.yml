@@ -1,0 +1,66 @@
+# Development only: builds the image locally and mounts app/ so changes show
+# up on reload. The published docker-compose.yml never builds or mounts files.
+#   docker compose -f dev/docker-compose.dev.yml up -d --build
+name: menu-qr-dev
+
+services:
+  init:
+    build:
+      context: ..
+    image: menu-qr:dev
+    command: ["init-secrets"]
+    volumes:
+      - secrets:/run/menuqr
+    restart: "no"
+
+  db:
+    image: mysql:8.4.11
+    command:
+      - --innodb-buffer-pool-size=64M
+      - --performance-schema=OFF
+      - --max-connections=40
+    environment:
+      MYSQL_DATABASE: menuqr
+      MYSQL_USER: menuqr
+      MYSQL_PASSWORD_FILE: /run/menuqr/db_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/menuqr/db_root_password
+    volumes:
+      - db_data:/var/lib/mysql
+      - secrets:/run/menuqr:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$(cat /run/menuqr/db_root_password)\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 60s
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  app:
+    image: menu-qr:dev
+    ports:
+      - "${APP_PORT:-8101}:80"
+    environment:
+      APP_PORT: ${APP_PORT:-8101}
+      MENUQR_RECOVERY: ${MENUQR_RECOVERY:-0}
+    volumes:
+      - ../app:/var/www/app
+      - app_data:/var/www/data
+      - secrets:/run/menuqr:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  app_data:
+  secrets:

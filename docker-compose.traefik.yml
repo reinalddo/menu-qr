@@ -1,0 +1,81 @@
+# menu-qr — deployment behind Hostinger's Traefik template (HTTPS on your domain).
+# Requires the Traefik project running on the same VPS (network "traefik-proxy")
+# and a DNS record pointing APP_DOMAIN to the VPS. No ports are published here.
+name: menu-qr
+
+services:
+  init:
+    image: ghcr.io/reinalddo/menu-qr:1.0.0
+    command: ["init-secrets"]
+    environment:
+      # Optional. Leave empty to generate a random password on the first start.
+      MENUQR_DB_PASSWORD: ${MENUQR_DB_PASSWORD:-}
+      MENUQR_DB_ROOT_PASSWORD: ${MENUQR_DB_ROOT_PASSWORD:-}
+    volumes:
+      - secrets:/run/menuqr
+    restart: "no"
+
+  db:
+    image: mysql:8.4.11
+    command:
+      - --innodb-buffer-pool-size=64M
+      - --performance-schema=OFF
+      - --max-connections=40
+    environment:
+      MYSQL_DATABASE: menuqr
+      MYSQL_USER: menuqr
+      MYSQL_PASSWORD_FILE: /run/menuqr/db_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/menuqr/db_root_password
+    volumes:
+      - db_data:/var/lib/mysql
+      - secrets:/run/menuqr:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$(cat /run/menuqr/db_root_password)\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  app:
+    image: ghcr.io/reinalddo/menu-qr:1.0.0
+    environment:
+      # REQUIRED: the domain of your menu, e.g. menu.myrestaurant.com
+      APP_DOMAIN: ${APP_DOMAIN:-menu.example.com}
+      # Set to 1 to print a password recovery code in the logs; set back to 0 afterwards.
+      MENUQR_RECOVERY: ${MENUQR_RECOVERY:-0}
+    volumes:
+      - app_data:/var/www/data
+      - secrets:/run/menuqr:ro
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-proxy
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-menu-qr}.rule=Host(`${APP_DOMAIN:-menu.example.com}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-menu-qr}.entrypoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-menu-qr}.tls.certresolver=letsencrypt
+      - traefik.http.services.${COMPOSE_PROJECT_NAME:-menu-qr}.loadbalancer.server.port=80
+    networks:
+      - default
+      - traefik-proxy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  traefik-proxy:
+    external: true
+
+volumes:
+  db_data:
+  app_data:
+  secrets:

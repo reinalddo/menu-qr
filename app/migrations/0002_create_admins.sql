@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS admins (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(190) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    language VARCHAR(5) NOT NULL DEFAULT 'es',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login_at DATETIME NULL,
+    UNIQUE KEY admins_email_unique (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4

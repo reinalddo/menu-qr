@@ -1,0 +1,36 @@
+# Local stand-in for Hostinger's Traefik template, to test docker-compose.traefik.yml.
+# Same names as the template: entrypoint "websecure", resolver "letsencrypt",
+# network "traefik-proxy". Ports 8180/8443 because WAMP already uses 80.
+# Let's Encrypt cannot issue certificates for *.localhost, so Traefik falls back
+# to its self-signed certificate and the browser shows a warning.
+name: traefik-local
+
+services:
+  traefik:
+    image: traefik:v3.7.15
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=traefik-proxy
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.email=dev@example.com
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+    ports:
+      - "8180:80"
+      - "8443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks:
+      - traefik-proxy
+    restart: unless-stopped
+
+networks:
+  traefik-proxy:
+    name: traefik-proxy
+
+volumes:
+  letsencrypt:

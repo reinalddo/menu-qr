@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS visit_counts (
+    day DATE NOT NULL,
+    source VARCHAR(8) NOT NULL,
+    views INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (day, source)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
