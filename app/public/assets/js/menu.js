@@ -157,4 +157,46 @@
             }
         });
     }
+
+    // ---- Visit counter: one visit per browser session, one view per dish opened.
+    // No cookies: the browser's sessionStorage remembers what was already counted.
+    function countOnce(key) {
+        try {
+            if (window.sessionStorage.getItem(key)) {
+                return false;
+            }
+            window.sessionStorage.setItem(key, '1');
+        } catch (error) {
+            // Private mode without storage: count anyway.
+        }
+        return true;
+    }
+
+    function beacon(url, data) {
+        var body = new FormData();
+        Object.keys(data).forEach(function (key) { body.append(key, data[key]); });
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(url, body);
+        } else {
+            fetch(url, { method: 'POST', body: body, keepalive: true });
+        }
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var source = params.get('src') === 'qr' ? 'qr' : 'link';
+    if (params.has('src') && window.history.replaceState) {
+        // Drop ?src=qr so a link shared from this page is not counted as a scan.
+        params.delete('src');
+        var query = params.toString();
+        window.history.replaceState(null, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash);
+    }
+    if (countOnce('menuqr:visit')) {
+        beacon('/api/visit', { source: source });
+    }
+    document.addEventListener('menu:dish-opened', function (event) {
+        var id = event.detail && event.detail.id;
+        if (id && countOnce('menuqr:dish:' + id)) {
+            beacon('/api/view', { dish: id });
+        }
+    });
 })();

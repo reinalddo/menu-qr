@@ -7,12 +7,14 @@ require dirname(__DIR__) . '/src/bootstrap.php';
 use MenuQr\Controllers\Admin\AccountController;
 use MenuQr\Controllers\Admin\AuthController;
 use MenuQr\Controllers\Admin\AvailabilityController;
+use MenuQr\Controllers\Admin\BackupController;
 use MenuQr\Controllers\Admin\CategoriesController;
 use MenuQr\Controllers\Admin\CustomizeController;
 use MenuQr\Controllers\Admin\DashboardController;
 use MenuQr\Controllers\Admin\DishesController;
 use MenuQr\Controllers\Admin\QrController;
 use MenuQr\Controllers\Admin\RestaurantController;
+use MenuQr\Controllers\ApiController;
 use MenuQr\Controllers\HealthController;
 use MenuQr\Controllers\HomeController;
 use MenuQr\Controllers\InstallController;
@@ -31,6 +33,8 @@ $router->get('/healthz', [HealthController::class, 'show']);
 $router->get('/install', [InstallController::class, 'handle']);
 $router->post('/install', [InstallController::class, 'handle']);
 $router->get('/install/done', [InstallController::class, 'done']);
+$router->post('/api/visit', [ApiController::class, 'visit']);
+$router->post('/api/view', [ApiController::class, 'view']);
 $router->get('/recover', [RecoverController::class, 'handle']);
 $router->post('/recover', [RecoverController::class, 'handle']);
 
@@ -70,6 +74,10 @@ $router->get('/admin/qr', [QrController::class, 'show']);
 $router->get('/admin/qr.svg', [QrController::class, 'svg']);
 $router->get('/admin/qr.png', [QrController::class, 'png']);
 $router->get('/admin/qr/print', [QrController::class, 'print']);
+
+$router->get('/admin/backup', [BackupController::class, 'show']);
+$router->get('/admin/backup/export', [BackupController::class, 'export']);
+$router->post('/admin/backup/import', [BackupController::class, 'import']);
 
 $router->get('/admin/account', [AccountController::class, 'edit']);
 $router->post('/admin/account', [AccountController::class, 'updateProfile']);

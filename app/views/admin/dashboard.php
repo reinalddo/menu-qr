@@ -19,6 +19,71 @@
     </a>
 </section>
 
+<section class="card" aria-labelledby="visits-title">
+    <h2 id="visits-title"><?= e(t('stats.title')) ?></h2>
+    <div class="stat-row">
+        <div class="metric"><span class="metric-value"><?= e($stats['today']) ?></span><span class="metric-label"><?= e(t('stats.today')) ?></span></div>
+        <div class="metric"><span class="metric-value"><?= e($stats['week']) ?></span><span class="metric-label"><?= e(t('stats.week')) ?></span></div>
+        <div class="metric"><span class="metric-value"><?= e($stats['month']) ?></span><span class="metric-label"><?= e(t('stats.month')) ?></span></div>
+        <div class="metric">
+            <span class="metric-value"><?= $stats['month'] > 0 ? e((string) round($stats['qr'] * 100 / $stats['month'])) . '%' : '—' ?></span>
+            <span class="metric-label"><?= e(t('stats.qr_share')) ?></span>
+        </div>
+    </div>
+
+    <?php if ($stats['month'] === 0): ?>
+        <p class="muted"><?= e(t('stats.empty')) ?></p>
+    <?php else: ?>
+        <?php $max = max(array_column($stats['daily'], 'views')); ?>
+        <figure class="chart">
+            <figcaption class="chart-caption"><?= e(t('stats.chart_title')) ?></figcaption>
+            <div class="chart-plot">
+                <span class="chart-max" aria-hidden="true"><?= e($max) ?></span>
+                <div class="chart-bars">
+                    <?php foreach ($stats['daily'] as $point): ?>
+                        <?php $label = date('d/m', strtotime($point['day'])) . ' · ' . t('stats.visits_count', ['count' => $point['views']]); ?>
+                        <span class="chart-col" tabindex="0" data-tip="<?= e($label) ?>" aria-label="<?= e($label) ?>">
+                            <?php if ($point['views'] > 0): ?>
+                                <span class="chart-bar" style="height: <?= e(max(3, round($point['views'] * 100 / $max))) ?>%"></span>
+                            <?php endif; ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="chart-axis" aria-hidden="true">
+                <span><?= e(date('d/m', strtotime($stats['daily'][0]['day']))) ?></span>
+                <span><?= e(t('stats.today')) ?></span>
+            </div>
+        </figure>
+        <details class="chart-table">
+            <summary><?= e(t('stats.as_table')) ?></summary>
+            <table>
+                <thead><tr><th scope="col"><?= e(t('stats.day')) ?></th><th scope="col"><?= e(t('stats.visits')) ?></th></tr></thead>
+                <tbody>
+                    <?php foreach (array_reverse($stats['daily']) as $point): ?>
+                        <tr><td><?= e(date('d/m/Y', strtotime($point['day']))) ?></td><td><?= e($point['views']) ?></td></tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </details>
+
+        <?php if ($stats['top'] !== []): ?>
+            <h3 class="subhead"><?= e(t('stats.top_dishes')) ?></h3>
+            <?php $topMax = $stats['top'][0]['views']; ?>
+            <ol class="top-list">
+                <?php foreach ($stats['top'] as $dish): ?>
+                    <li>
+                        <span class="top-name"><?= e($dish['name']) ?></span>
+                        <span class="top-track" aria-hidden="true"><span style="width: <?= e(round($dish['views'] * 100 / $topMax)) ?>%"></span></span>
+                        <span class="top-value"><?= e($dish['views']) ?></span>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        <?php endif; ?>
+    <?php endif; ?>
+    <p class="help"><?= e(t('stats.privacy')) ?></p>
+</section>
+
 <?php if ($counts['categories'] === 0): ?>
     <section class="card card-highlight">
         <h2><?= e(t('dashboard.start.title')) ?></h2>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MenuQr\Controllers\Admin;
 
 use MenuQr\Models\Dishes;
+use MenuQr\Models\Stats;
 use MenuQr\Money;
 use MenuQr\Settings;
 
@@ -16,6 +17,7 @@ final class DashboardController extends AdminController
         self::render('dashboard', 'dashboard', [
             'title' => t('nav.dashboard'),
             'counts' => Dishes::counts(),
+            'stats' => Stats::summary(),
             'menuUrl' => Settings::get('menu_url'),
             'secondCurrency' => Settings::get('second_currency_enabled') === '1' ? [
                 'code' => Settings::get('second_currency_code'),

@@ -11,6 +11,7 @@ $nav = [
     'restaurant' => '/admin/restaurant',
     'customize' => '/admin/customize',
     'qr' => '/admin/qr',
+    'backup' => '/admin/backup',
     'account' => '/admin/account',
 ];
 
