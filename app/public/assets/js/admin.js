@@ -87,6 +87,41 @@
         });
     });
 
+    // Opening hours: show the time inputs only for open days.
+    document.querySelectorAll('[data-hours-day]').forEach(function (day) {
+        var open = day.querySelector('[data-hours-open]');
+        open.addEventListener('change', function () {
+            day.querySelector('[data-hours-ranges]').hidden = !open.checked;
+            day.querySelector('[data-hours-closed]').hidden = open.checked;
+            var first = day.querySelector('input[type="time"]');
+            if (open.checked && first && first.value === '') {
+                first.focus();
+            }
+        });
+    });
+
+    // Copy Monday's hours to every other day.
+    var copyMonday = document.querySelector('[data-hours-copy]');
+    if (copyMonday) {
+        copyMonday.addEventListener('click', function () {
+            var days = document.querySelectorAll('[data-hours-day]');
+            var monday = days[0];
+            var mondayOpen = monday.querySelector('[data-hours-open]').checked;
+            var mondayTimes = monday.querySelectorAll('input[type="time"]');
+            days.forEach(function (day, index) {
+                if (index === 0) {
+                    return;
+                }
+                var open = day.querySelector('[data-hours-open]');
+                open.checked = mondayOpen;
+                open.dispatchEvent(new Event('change'));
+                day.querySelectorAll('input[type="time"]').forEach(function (input, i) {
+                    input.value = mondayTimes[i].value;
+                });
+            });
+        });
+    }
+
     // Sizes: add and remove rows.
     var sizes = document.querySelector('[data-sizes]');
     var template = document.getElementById('size-row-template');

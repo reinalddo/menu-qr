@@ -1,0 +1,18 @@
+{
+    "name": "reinalddo/menu-qr",
+    "description": "Self-hosted QR digital menu for restaurants",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "ext-gd": "*",
+        "ext-mbstring": "*",
+        "chillerlan/php-qrcode": "^6.0.1"
+    },
+    "config": {
+        "platform": {
+            "php": "8.3.36"
+        },
+        "sort-packages": true
+    }
+}

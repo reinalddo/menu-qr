@@ -1,0 +1,76 @@
+/* Printable QR table cards. "1 per page" is one large card; "4 per page" fits A4 and Letter. */
+
+@page { size: auto; margin: 10mm; }
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #1c1917;
+    background: #f5f0ea;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem 1.25rem;
+    padding: 1rem;
+    background: #fff;
+    border-bottom: 1px solid #e7e1d8;
+    text-align: center;
+}
+.toolbar p { margin: 0; color: #6b635d; }
+.toolbar button {
+    padding: .7rem 1.5rem;
+    border: 0;
+    border-radius: 10px;
+    background: var(--brand);
+    color: var(--brand-text);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.sheet {
+    display: grid;
+    gap: 8mm;
+    justify-content: center;
+    padding: 1.5rem;
+}
+.per-page-4 .sheet { grid-template-columns: repeat(2, 90mm); }
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8mm 6mm 6mm;
+    border: 1.5px solid #e7e1d8;
+    border-top: 6mm solid var(--brand);
+    border-radius: 5mm;
+    background: #fff;
+    text-align: center;
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+.per-page-1 .card { width: 140mm; }
+.per-page-4 .card { width: 90mm; height: 125mm; justify-content: center; }
+
+.card-logo { width: 18mm; height: 18mm; object-fit: contain; border-radius: 50%; margin-bottom: 3mm; }
+.card-name { margin: 0; font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-size: 22pt; line-height: 1.1; }
+.per-page-4 .card-name { font-size: 15pt; }
+.card-call { margin: 3mm 0 4mm; font-weight: 700; font-size: 13pt; color: #44403c; }
+.per-page-4 .card-call { font-size: 10pt; margin: 2mm 0 3mm; }
+.card-qr { width: 95mm; height: 95mm; }
+.per-page-4 .card-qr { width: 55mm; height: 55mm; }
+.card-url { margin: 3mm 0 0; font-size: 10pt; color: #6b635d; word-break: break-all; }
+.per-page-4 .card-url { font-size: 8pt; }
+
+@media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .sheet { padding: 0; }
+}

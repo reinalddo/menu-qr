@@ -8,8 +8,10 @@ use MenuQr\Controllers\Admin\AccountController;
 use MenuQr\Controllers\Admin\AuthController;
 use MenuQr\Controllers\Admin\AvailabilityController;
 use MenuQr\Controllers\Admin\CategoriesController;
+use MenuQr\Controllers\Admin\CustomizeController;
 use MenuQr\Controllers\Admin\DashboardController;
 use MenuQr\Controllers\Admin\DishesController;
+use MenuQr\Controllers\Admin\QrController;
 use MenuQr\Controllers\Admin\RestaurantController;
 use MenuQr\Controllers\HealthController;
 use MenuQr\Controllers\HomeController;
@@ -59,6 +61,15 @@ $router->post('/admin/dishes/{id}/delete', [DishesController::class, 'delete']);
 
 $router->get('/admin/restaurant', [RestaurantController::class, 'edit']);
 $router->post('/admin/restaurant', [RestaurantController::class, 'update']);
+
+$router->get('/admin/customize', [CustomizeController::class, 'edit']);
+$router->post('/admin/customize', [CustomizeController::class, 'update']);
+$router->post('/admin/customize/rate', [CustomizeController::class, 'updateRate']);
+
+$router->get('/admin/qr', [QrController::class, 'show']);
+$router->get('/admin/qr.svg', [QrController::class, 'svg']);
+$router->get('/admin/qr.png', [QrController::class, 'png']);
+$router->get('/admin/qr/print', [QrController::class, 'print']);
 
 $router->get('/admin/account', [AccountController::class, 'edit']);
 $router->post('/admin/account', [AccountController::class, 'updateProfile']);

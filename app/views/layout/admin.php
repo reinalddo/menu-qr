@@ -9,6 +9,8 @@ $nav = [
     'dishes' => '/admin/dishes',
     'categories' => '/admin/categories',
     'restaurant' => '/admin/restaurant',
+    'customize' => '/admin/customize',
+    'qr' => '/admin/qr',
     'account' => '/admin/account',
 ];
 

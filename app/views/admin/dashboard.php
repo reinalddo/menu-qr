@@ -37,11 +37,28 @@
     </section>
 <?php endif; ?>
 
+<?php if ($secondCurrency !== null): ?>
+    <section class="card">
+        <h2><?= e(t('dashboard.rate.title', ['code' => $secondCurrency['code']])) ?></h2>
+        <form method="post" action="/admin/customize/rate" class="form inline-form">
+            <?= \MenuQr\Csrf::field() ?>
+            <label for="second_currency_rate" class="visually-hidden"><?= e(t('customize.rate')) ?></label>
+            <input id="second_currency_rate" name="second_currency_rate" type="text" inputmode="decimal" required
+                   value="<?= e($secondCurrency['rate']) ?>" class="input-price">
+            <button type="submit" class="button button-primary"><?= e(t('dashboard.rate.update')) ?></button>
+        </form>
+        <?php if ($secondCurrency['updated_at'] !== ''): ?>
+            <p class="help"><?= e(t('customize.rate.updated', ['date' => date('d/m/Y H:i', strtotime($secondCurrency['updated_at']))])) ?> (UTC)</p>
+        <?php endif; ?>
+    </section>
+<?php endif; ?>
+
 <section class="card">
     <h2><?= e(t('dashboard.menu_address')) ?></h2>
     <p class="url-box"><?= e($menuUrl) ?></p>
     <div class="actions">
         <a class="button" href="/" target="_blank" rel="noopener"><?= e(t('nav.view_menu')) ?></a>
+        <a class="button" href="/admin/qr"><?= e(t('nav.qr')) ?></a>
         <a class="button" href="/admin/restaurant#menu_url"><?= e(t('dashboard.change_address')) ?></a>
     </div>
 </section>
