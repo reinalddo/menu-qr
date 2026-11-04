@@ -41,11 +41,11 @@ There are two versions of the Compose file. Pick one:
 
 **Simple:**
 
-[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/docker-hosting?compose_url=https://raw.githubusercontent.com/reinalddo/menu-qr/refs/tags/v1.0.0/docker-compose.yml&REFERRALCODE=__REFERRALCODE__)
+[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/docker-hosting?compose_url=https://raw.githubusercontent.com/reinalddo/menu-qr/refs/tags/v1.0.0/docker-compose.yml&REFERRALCODE=YHUREINALDQF)
 
 **With your domain and HTTPS** (requires Hostinger's **Traefik** template running on the same VPS — see [Custom domain with HTTPS](#custom-domain-with-https)):
 
-[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/docker-hosting?compose_url=https://raw.githubusercontent.com/reinalddo/menu-qr/refs/tags/v1.0.0/docker-compose.traefik.yml&REFERRALCODE=__REFERRALCODE__)
+[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/docker-hosting?compose_url=https://raw.githubusercontent.com/reinalddo/menu-qr/refs/tags/v1.0.0/docker-compose.traefik.yml&REFERRALCODE=YHUREINALDQF)
 
 The button opens Hostinger's Docker hosting page. After you choose a VPS plan, Hostinger prepares Docker and opens **Docker Manager** with the menu-qr Compose file loaded. Review the variables in the preview and click **Deploy**.
 
@@ -179,11 +179,11 @@ Hay dos versiones del archivo Compose. Elige una:
 
 **Simple:**
 
-[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/docker-hosting?compose_url=https://raw.githubusercontent.com/reinalddo/menu-qr/refs/tags/v1.0.0/docker-compose.yml&REFERRALCODE=__REFERRALCODE__)
+[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/docker-hosting?compose_url=https://raw.githubusercontent.com/reinalddo/menu-qr/refs/tags/v1.0.0/docker-compose.yml&REFERRALCODE=YHUREINALDQF)
 
 **Con tu dominio y HTTPS** (necesita la plantilla **Traefik** de Hostinger funcionando en el mismo VPS; mira [Dominio propio con HTTPS](#dominio-propio-con-https)):
 
-[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/docker-hosting?compose_url=https://raw.githubusercontent.com/reinalddo/menu-qr/refs/tags/v1.0.0/docker-compose.traefik.yml&REFERRALCODE=__REFERRALCODE__)
+[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/docker-hosting?compose_url=https://raw.githubusercontent.com/reinalddo/menu-qr/refs/tags/v1.0.0/docker-compose.traefik.yml&REFERRALCODE=YHUREINALDQF)
 
 El botón abre la página de Docker hosting de Hostinger. Cuando eliges un plan de VPS, Hostinger prepara Docker y abre **Docker Manager** con el Compose de menu-qr cargado. Revisa las variables en la vista previa y pulsa **Deploy**.
 
