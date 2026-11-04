@@ -2,6 +2,9 @@
 CLAUDE.md
 DISENO.md
 
+# Menu backups downloaded from the admin panel (they contain the restaurant's data)
+*.zip
+
 # Local environment
 .env
 docker-compose.override.yml
