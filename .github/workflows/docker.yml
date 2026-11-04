@@ -1,0 +1,105 @@
+name: Docker image
+
+# Every push and pull request: build the image and smoke-test it with the published
+# docker-compose.yml alone, the way Hostinger's Docker Manager runs it.
+# Publishing to ghcr.io (amd64 + arm64), tagged with APP_VERSION:
+#   - "Run workflow" (manual): publish a version to test it before tagging the release.
+#   - Tags vX.Y.Z: publish the released version.
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*.*.*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+  PUBLISH: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v') }}
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the version
+        id: version
+        run: |
+          version=$(sed -n "s/^define('APP_VERSION', '\(.*\)');/\1/p" app/src/bootstrap.php)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tags=$IMAGE:$version,$IMAGE:$(echo "$version" | cut -d. -f1,2)" >> "$GITHUB_OUTPUT"
+          for file in docker-compose.yml docker-compose.traefik.yml; do
+            if ! grep -q "image: $IMAGE:$version\$" "$file"; then
+              echo "::error file=$file::The app image must be $IMAGE:$version"
+              exit 1
+            fi
+          done
+          if [[ "$GITHUB_REF" == refs/tags/v* && "${GITHUB_REF_NAME#v}" != "$version" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match APP_VERSION $version"
+            exit 1
+          fi
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build for the smoke test
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: ${{ env.IMAGE }}:${{ steps.version.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test with docker-compose.yml alone
+        run: |
+          mkdir -p "$RUNNER_TEMP/smoke"
+          cp docker-compose.yml "$RUNNER_TEMP/smoke/"
+          cd "$RUNNER_TEMP/smoke"
+          docker compose up -d
+          status=""
+          for _ in $(seq 1 60); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' menu-qr-app-1 2>/dev/null || true)
+            [ "$status" = "healthy" ] && break
+            sleep 3
+          done
+          docker compose ps
+          if [ "$status" != "healthy" ]; then
+            docker compose logs
+            exit 1
+          fi
+          curl -fsS http://localhost:8101/healthz
+          curl -fsS http://localhost:8101/install | grep -q 'name="setup_code"'
+          docker compose logs app | grep -q 'Setup code:'
+          docker compose down -v
+
+      - name: Log in to GitHub Container Registry
+        if: env.PUBLISH == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU for arm64
+        if: env.PUBLISH == 'true'
+        uses: docker/setup-qemu-action@v4
+
+      - name: Publish to ghcr.io
+        if: env.PUBLISH == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.version.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

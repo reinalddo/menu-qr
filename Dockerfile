@@ -14,13 +14,28 @@ LABEL org.opencontainers.image.source="https://github.com/reinalddo/menu-qr" \
       org.opencontainers.image.description="Self-hosted QR digital menu for restaurants" \
       org.opencontainers.image.licenses="MIT"
 
+# Build the extensions with the -dev packages, then remove them and keep only the
+# runtime libraries the compiled extensions link to (same approach as the official images).
 RUN set -eux; \
+    savedAptMark="$(apt-mark showmanual)"; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
         libfreetype-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libzip-dev; \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
     docker-php-ext-install -j"$(nproc)" gd pdo_mysql zip exif opcache; \
-    rm -rf /var/lib/apt/lists/*
+    apt-mark auto '.*' > /dev/null; \
+    apt-mark manual $savedAptMark; \
+    ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
+        | awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
+        | sort -u \
+        | xargs -r dpkg-query --search \
+        | cut -d: -f1 \
+        | sort -u \
+        | xargs -r apt-mark manual; \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+    rm -rf /var/lib/apt/lists/*; \
+    php -m | grep -qi '^gd$'; \
+    php -r 'exit(gd_info()["WebP Support"] ? 0 : 1);'
 
 RUN set -eux; \
     a2enmod headers; \
